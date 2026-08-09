@@ -1,88 +1,62 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f2027,100:2c5364&height=120&section=header&text=Python%20Projects&fontSize=40&fontAlignY=35&animation=fadeIn"/>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:141E30,100:243B55&height=120&section=header&text=Python%20Projects&fontSize=38&fontAlignY=35&animation=fadeIn"/>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-Projects-blue?style=for-the-badge&logo=python"/>
-  <img src="https://img.shields.io/badge/TypeScript-Enabled-3178C6?style=for-the-badge&logo=typescript"/>
-  <img src="https://img.shields.io/badge/Focus-Automation-informational?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/AI-Integration-black?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Projects-Multiple-blue?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Focus-Real%20Use--Cases-informational?style=for-the-badge"/>
 </p>
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=18&duration=2500&pause=1000&color=00FFAA&center=true&vCenter=true&width=500&lines=building+useful+systems...;automation+%2F+ai+%2F+tools;real+projects+%3E+tutorials"/>
+  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=18&duration=2500&pause=1000&color=00FFAA&center=true&vCenter=true&width=500&lines=building+useful+python+projects...;automation+%2F+tools+%2F+systems;learning+by+building"/>
 </p>
 
 ---
 
 ## Overview
 
-A curated collection of projects focused on **automation, real-world use cases, and system thinking**.
+A collection of Python projects built around **automation, utility, and practical problem-solving**.
+Each folder represents a standalone idea, explored through code.
 
 ---
 
-## Tech Stack
+## Projects
 
-<p>
-  <img src="https://skillicons.dev/icons?i=python,ts,js,html,css"/>
-</p>
-
----
-
-## Structure
-
-```bash
+```bash id="j2k9sd"
 Python-Projects/
 │
 ├── Day Planner/
 ├── ...
-└── more incoming
+└── more projects coming soon
 ```
 
 ---
 
-## Focus
+## What this repo is
 
-* real-world problem solving
-* automation & efficiency
-* building practical systems
-
----
-
-## Stats
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=Teerth-Sonawani&show_icons=true&theme=tokyonight&hide_border=true"/>
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Teerth-Sonawani&theme=tokyonight&hide_border=true"/>
-</p>
+* a place to experiment
+* a place to build real things
+* a place to improve consistently
 
 ---
 
-## Activity
+## Direction
 
-<p align="center">
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=Teerth-Sonawani&theme=tokyo-night&hide_border=true"/>
-</p>
-
----
-
-## Philosophy
-
-```txt
-build > consume
-systems > scripts
-consistency > intensity
+```txt id="g7sk3a"
+→ better project depth
+→ cleaner architecture
+→ more real-world applications
 ```
 
 ---
 
-## Author
+## Notes
 
-**Teerth Sonawani**
-B.Tech CSE • Python / TypeScript Developer
+Projects here are iterative — expect frequent updates, rewrites, and improvements over time.
 
 ---
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:2c5364,100:0f2027&height=100&section=footer"/>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:243B55,100:141E30&height=100&section=footer"/>
 </p>
