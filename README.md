@@ -1,62 +1,62 @@
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:141E30,100:243B55&height=120&section=header&text=Python%20Projects&fontSize=38&fontAlignY=35&animation=fadeIn"/>
-</p>
+# Python Projects
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Projects-Multiple-blue?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Focus-Real%20Use--Cases-informational?style=for-the-badge"/>
-</p>
+A growing collection of small Python projects — scripts, tools, and mini-apps built to practice real problem-solving, automation, and clean code habits.
 
-<p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=18&duration=2500&pause=1000&color=00FFAA&center=true&vCenter=true&width=500&lines=building+useful+python+projects...;automation+%2F+tools+%2F+systems;learning+by+building"/>
-</p>
-
----
-
-## Overview
-
-A collection of Python projects built around **automation, utility, and practical problem-solving**.
-Each folder represents a standalone idea, explored through code.
-
----
+Each folder in this repo is a self-contained project with its own code and (where needed) its own dependencies.
 
 ## Projects
 
-```bash id="j2k9sd"
+| Project | Description | Status |
+|---|---|---|
+| [Day Planner](./Day%20Planner) | A simple day-planning tool for organizing and tracking daily tasks. | Active |
+
+More projects will be added here as they're built — this table gets a new row each time.
+
+## Getting Started
+
+Clone the repo:
+
+```bash
+git clone https://github.com/Teerth-Sonawani/Python-Projects.git
+cd Python-Projects
+```
+
+Each project lives in its own folder. To run one, `cd` into it and follow any project-specific instructions (a project may include its own README or requirements file):
+
+```bash
+cd "Day Planner"
+python main.py
+```
+
+**Requirements:** Python 3.10+ is recommended unless a project states otherwise.
+
+## Repo Structure
+
+```
 Python-Projects/
-│
-├── Day Planner/
-├── ...
-└── more projects coming soon
+├── Day Planner/     # daily task planning tool
+└── README.md
 ```
 
----
+## Goals
 
-## What this repo is
+This repo exists to:
 
-* a place to experiment
-* a place to build real things
-* a place to improve consistently
+- Build practical, working tools instead of just tutorials
+- Get more comfortable with clean project structure and readable code
+- Iterate — projects here will be revisited, refactored, and improved over time
 
----
+## Roadmap
 
-## Direction
+- [ ] Add more standalone project folders
+- [ ] Give each project its own README with setup/usage instructions
+- [ ] Add requirements.txt / dependency files where needed
+- [ ] Improve overall code structure as the collection grows
 
-```txt id="g7sk3a"
-→ better project depth
-→ cleaner architecture
-→ more real-world applications
-```
+## Contributing
 
----
+This is primarily a personal learning repo, but suggestions, issues, and pull requests are welcome if you spot a bug or have an idea for improvement.
 
-## Notes
+## License
 
-Projects here are iterative — expect frequent updates, rewrites, and improvements over time.
-
----
-
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:243B55,100:141E30&height=100&section=footer"/>
-</p>
+No license has been added yet — until one is, please treat this code as "all rights reserved" for reuse purposes. Feel free to open an issue if you'd like a license added.
