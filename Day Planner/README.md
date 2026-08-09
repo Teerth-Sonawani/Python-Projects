@@ -161,4 +161,4 @@ following are Windows-only and no-op silently elsewhere:
 
 ## License
 
-Add a license of your choice here (e.g. MIT).
+MIT — see [LICENSE](LICENSE) for the full text.
