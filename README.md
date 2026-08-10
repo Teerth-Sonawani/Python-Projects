@@ -9,6 +9,7 @@ Each folder in this repo is a self-contained project with its own code and (wher
 | Project | Description | Status |
 |---|---|---|
 | [Day Planner](./Day%20Planner) | A simple day-planning tool for organizing and tracking daily tasks. | Active |
+| [Binary Banner Animation](./Binary-Banner-Animation) | The code that was used to generate the banner in my profile. | Active |
 
 More projects will be added here as they're built — this table gets a new row each time.
 
