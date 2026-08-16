@@ -10,6 +10,7 @@ Each folder in this repo is a self-contained project with its own code and (wher
 |---|---|---|
 | [Day Planner](./Day%20Planner) | A simple day-planning tool for organizing and tracking daily tasks. | Active |
 | [Binary Banner Animation](./Binary-Banner-Animation) | The code that was used to generate the banner in my profile. | Active |
+| [SnakeXChess](./Chess_Snake_Fusion) | A fusion between classical chess and snake. | Active |
 
 More projects will be added here as they're built — this table gets a new row each time.
 
@@ -57,7 +58,4 @@ This repo exists to:
 ## Contributing
 
 This is primarily a personal learning repo, but suggestions, issues, and pull requests are welcome if you spot a bug or have an idea for improvement.
-
-## License
-
-No license has been added yet — until one is, please treat this code as "all rights reserved" for reuse purposes. Feel free to open an issue if you'd like a license added.
+ 
