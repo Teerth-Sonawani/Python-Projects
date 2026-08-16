@@ -1,121 +1,119 @@
-# Chess with a Hungry Snake ♟️🐍
+# 🐍 Chess with a Hungry Snake
 
-A full game of chess... except there's a snake loose on the board, and it's hunting your pieces.
+A twist on classic chess: a hungry, growing snake lives on the board and will eat *any* piece — yours or your opponent's — that it can path its way to. Outmaneuver your opponent **and** the snake to deliver checkmate.
 
-Built with Python and Pygame. Every standard chess rule is implemented — castling, en passant, pawn promotion, check, checkmate, stalemate — but the snake is a living hazard that both players have to react to, work around, and occasionally fight back against.
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![Pygame](https://img.shields.io/badge/pygame-2.x-green)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-## How It Works
+---
 
-### The Snake
+## 🎮 Overview
 
-- The snake starts as a 3-segment body in the middle of the board and is **not aligned to either player** — it picks a side to hunt and goes after that side's pieces.
-- Each turn, the snake picks a target piece (of whichever color it's currently hunting) that it can actually path to, and moves one step closer to it using pathfinding across empty squares. It cannot pass through its own body or through a King's square.
-- If the snake reaches a piece, **it eats it** — the piece is removed from the board, just like a capture.
-- **If the snake eats a King, that side loses immediately.** The other player wins by default, even mid-game with no checkmate involved.
-- After eating a piece, there's a 50% chance the snake switches its hunt to the *other* color next.
-- The snake **speeds up** the longer the game goes on — it moves multiple squares per turn instead of one, based on how many full rounds have been played:
-  - Turns 0–29: normal speed (1 square/turn)
-  - Turns 30–59: fast (2 squares/turn)
-  - Turns 60+: very fast (3 squares/turn)
+This is standard chess played on an 8×8 board — with one major complication: a snake slithers around the board, hunting down pieces and devouring them. Every few turns it grows faster and hungrier, and the only way to slow it down is to strike its head or feed it bait. Checkmate still wins the game, but you'll need to manage the snake as carefully as you manage your position.
 
-### Fighting Back: Attacking the Snake
+## ✨ Features
 
-- The snake's head is a legal move target for your pieces, exactly like a normal capture square. If one of your pieces can legally reach the snake's head, you can move onto it to strike the snake.
-- A successful strike **stuns the snake for 3 of your turns** (6 half-moves). While stunned, the snake doesn't move.
-- Striking the snake also has a 50% chance of making it switch which color it's hunting.
-- You can't strike an already-stunned snake — it just shrugs it off.
+- **Full chess rules** — legal move generation, check/checkmate/stalemate detection, castling (kingside & queenside), en passant, and pawn promotion (Queen, Rook, Bishop, Knight).
+- **A living, hunting snake**
+  - Uses breadth-first search to path toward its current target and always takes the shortest route.
+  - **Eats any piece** (white or black, except kings) that it reaches — permanently removing it from play.
+  - **Grows by one segment** every time it eats, and its body blocks movement for both sides.
+  - Retargets automatically when its current target dies or becomes unreachable, and prefers to keep attacking the side it just fed on.
+- **Escalating difficulty** — the snake speeds up over time, moving multiple squares per player turn as the game goes on (three speed tiers).
+- **Fight back** — instead of moving a piece, you can attack the snake's head directly with any piece that can legally reach it, stunning it for several turns.
+- **Bait system** — every 5 turns, each side without one receives a piece of bait. Place it on an empty square to lure the snake away from your pieces and buy yourself time.
+- **Animated movement** — the snake steps square-by-square with a short delay so you can watch it hunt in real time, instead of teleporting to its destination.
+- **Graceful fallback rendering** — if custom sprite assets aren't found, the game automatically falls back to hand-drawn circles/shapes and Unicode chess glyphs, so it always runs.
 
-### Bait
-
-- Every 5 turns, any side that doesn't currently hold a bait token automatically receives one (shown as a badge on the bottom corner of the board matching your color).
-- If you have a bait token, you can click your badge to enter **bait placement mode**, then click any empty square (not occupied by a piece or the snake) to drop bait there. This uses your turn.
-- Once bait is on the board, the snake will beeline for it over any piece — a way to lure it away from your King or a piece it's stalking.
-- You can't place bait while your King is in check.
-
-### Standard Chess Rules (Still Fully in Play)
-
-All of this happens on top of normal chess:
-- Legal moves for every piece type, including check detection (the snake's body and head count as obstacles/threats when calculating legality).
-- **Castling** (kingside and queenside), with the usual conditions — King and Rook haven't moved, squares between them are clear (of pieces *and* the snake), and the King doesn't pass through check.
-- **En passant** capture.
-- **Pawn promotion** — reaching the back rank opens a selection prompt for Queen, Rook, Bishop, or Knight.
-- **Checkmate** and **stalemate** detection, accounting for the snake occupying or threatening squares.
-- Standard win by capturing the enemy King directly, on top of the snake-related win condition above.
-
-## Controls
-
-Mouse only:
+## 🕹️ How to Play
 
 | Action | How |
 |---|---|
 | Select a piece | Click on one of your pieces |
-| Move / capture | Click a highlighted legal square |
-| Attack the snake | Click the snake's head when it's a highlighted legal move |
-| Enter bait mode | Click your bait badge (bottom-left for White, bottom-right for Black) |
-| Place bait | While in bait mode, click any empty square |
-| Cancel bait mode | Click your badge again |
+| Move it | Click a highlighted destination square |
+| Attack the snake | Click the snake's head when it's highlighted as a legal move |
+| Place bait | Click your bait badge (bottom corner), then click an empty square |
 | Promote a pawn | Click your chosen piece in the promotion popup |
 
-**Highlight colors:**
-- Green outline — selected piece
-- Gray — normal move
-- Red — capture
-- Orange — attacking the snake's head
-- Cyan — moving onto bait
-- Yellow — legal bait-drop squares (while in bait mode)
-- Red ring around King — King is in check
+### Board Highlights
 
-## Requirements
+| Color | Meaning |
+|---|---|
+| 🟩 Green outline | Currently selected piece |
+| ⬜ Gray tile | Regular legal move |
+| 🟥 Red tile | Capturing an enemy piece |
+| 🟠 Orange tile | Attacking the snake's head |
+| 🔵 Cyan tile | Moving onto the bait |
+| 🟡 Gold ring | King in check |
+| 🩷 Magenta ring | The snake's current target |
 
-- Python 3.x
+## 🐍 Snake Behavior
+
+- The snake targets one color at a time, choosing a random reachable non-king piece to hunt.
+- If it can't reach any piece of its current target color, it switches sides — unless it just ate, in which case it stays locked onto that color for its next move.
+- **Stunning:** Any piece that legally attacks the snake's head stuns it for 6 half-moves (roughly 3 full turns), during which it can't move but also can't be harmed further.
+- **Bait:** Placed bait becomes the snake's top priority target, overriding whatever piece it was chasing.
+- **Speed tiers:** The snake starts at normal speed and speeds up at set turn thresholds, taking multiple steps per player turn later in the game.
+
+## ⚙️ Setup
+
+### Requirements
+
+- Python 3.8+
 - [Pygame](https://www.pygame.org/)
-
-Install the dependency:
 
 ```bash
 pip install pygame
 ```
 
-Run the game:
+### Run
 
 ```bash
-python Chess_Snake_Fusion.py
+python main.py
 ```
 
-(Use whatever the actual filename is in this folder.)
+### Custom Assets (optional)
 
-## Assets
+The game looks for artwork in two possible locations, in this order:
 
-The game looks for artwork in an `assets/` folder next to the script, but **it doesn't require it** — anything missing falls back to simple drawn shapes and Unicode chess glyphs, so it runs out of the box.
+1. `assets/<path>` — an `assets/` subfolder next to the script
+2. `<path>` — the folders placed directly next to the script (no `assets/` wrapper)
 
-If you want to add your own art, the expected structure is:
+Whichever is found first wins, so you can organize assets either way. If a file isn't found in either location, the game falls back to built-in placeholder graphics — nothing is required to run the game.
 
 ```
-assets/
-├── pieces/
-│   ├── wP.png, wN.png, wB.png, wR.png, wQ.png, wK.png
-│   └── bP.png, bN.png, bB.png, bR.png, bQ.png, bK.png
-├── board/
-│   ├── light.png
-│   ├── dark.png
-│   └── background.png
-├── bait/
-│   └── bait.png
-├── snake/          # base speed tier
-├── snake_1/         # tier unlocked at turn 30
-├── snake_2/         # tier unlocked at turn 60
-└── (each snake_* folder can contain: head_up/down/left/right.png,
-     head_*_stunned.png, body_horizontal/vertical.png,
-     body_topleft/topright/bottomleft/bottomright.png,
-     tail_up/down/left/right.png, apple.png)
+(either directly next to main.py, or nested one level under assets/)
+
+board/
+├── light.png
+├── dark.png
+└── background.png
+pieces/
+├── wP.png, wN.png, wB.png, wR.png, wQ.png, wK.png
+└── bP.png, bN.png, bB.png, bR.png, bQ.png, bK.png
+bait/
+└── bait.png
+snake/          (tier 1 — base speed)
+snake_1/        (tier 2 — medium speed)
+snake_2/        (tier 3 — fast)
 ```
 
-Each snake tier can have its own look — useful for visually signaling that the snake has sped up.
+Each snake tier folder can contain directional head/body/tail segments (e.g. `head_up.png`, `body_horizontal.png`, `tail_left.png`, stunned variants, and `apple.png` for bait). Any missing file automatically falls back to the previous tier's art, then to the generic snake sprites, then to simple shapes.
 
-## Credits
+## 🏆 Winning
 
-Created by **Teerth Sonawani**.
+- **Checkmate** the opposing king — standard chess win condition.
+- **Stalemate** results in a draw.
+- If the **snake eats a king**, the *other* side wins by default.
+- Capturing the enemy king directly (if somehow left exposed) is also a win.
 
-## License
+## 🛠️ Tech Notes
 
-This project is licensed under **CC BY-ND 4.0** — you're free to share it as-is with credit, but you may not modify/remix it and redistribute your own version. See [`LICENSE`](./LICENSE) for the full terms.
+- Built with `pygame` for rendering and input, and Python's `collections.deque` for BFS pathfinding.
+- Chess logic (move generation, check detection, castling, en passant) is implemented from scratch — no external chess engine.
+- Snake pathfinding treats both kings and its own body as obstacles, and recalculates its route every step.
+
+---
+
+Enjoy — and don't forget to watch your flank. The snake doesn't care whose piece it eats. 🐍♟️
