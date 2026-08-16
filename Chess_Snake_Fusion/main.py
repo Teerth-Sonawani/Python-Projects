@@ -4,7 +4,7 @@ import sys
 import os
 from collections import deque
 
-# --- Setup ---
+# --- Setup -----
 pygame.init()
 
 BOARD_SIZE = 8
@@ -18,23 +18,16 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Chess with a Hungry Snake")
 clock = pygame.time.Clock()
 
-# Colors (I just copy-pasted these from a color picker, don't judge)
-LT = (240, 217, 181)
-DK = (181, 136, 99)
+# Colors 
 SELC = (106, 168, 79)
 MVD = (60, 60, 60)
 CAPR = (200, 40, 40)
 ATKR = (255, 140, 0)
 BAITATK = (80, 220, 255)
-SHC = (30, 140, 30)
-SBC = (60, 190, 60)
-SFC = (120, 190, 230)
-SEC = (0, 0, 0)
 SBG = (25, 25, 25)
 TC = (255, 255, 255)
 DTC = (170, 170, 170)
 GOBG = (0, 0, 0, 180)
-BTC = (220, 60, 60)
 BTR = (255, 220, 120)
 TBG = (60, 45, 10, 230)
 TTX = (255, 215, 120)
@@ -56,43 +49,28 @@ HILITE_PROMO_BG  = (18, 18, 24, 235)
 STUN_HALF_MOVES = 6
 STEP_DELAY_MS = 160
 
-WHITE_GLYPH = {'P': '\u2659', 'N': '\u2658', 'B': '\u2657', 'R': '\u2656', 'Q': '\u2655', 'K': '\u2654'}
-BLACK_GLYPH = {'P': '\u265F', 'N': '\u265E', 'B': '\u265D', 'R': '\u265C', 'Q': '\u265B', 'K': '\u265A'}
-
-# Fonts - hope these exist on the user's system (im cooked)
-pf = pygame.font.SysFont(['segoeuisymbol', 'dejavusans', 'arialunicodems', 'notosanssymbols2', None], 56)
 sf = pygame.font.SysFont(['segoeui', 'arial', None], 22)
 smf = pygame.font.SysFont(['segoeui', 'arial', None], 18)
 bf = pygame.font.SysFont(['segoeui', 'arial', None], 46)
 tf = pygame.font.SysFont(['segoeui', 'arial', None], 24)
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ASSET_DIR_CANDIDATES = [os.path.join(SCRIPT_DIR, 'assets'), SCRIPT_DIR]
+ASSET_DIR = os.path.join(SCRIPT_DIR, 'assets')
 
 def loadimg(pth, sz):
-    for base in ASSET_DIR_CANDIDATES:
-        fpp = os.path.join(base, pth)
-        if os.path.isfile(fpp):
-            try:
-                imz = pygame.image.load(fpp).convert_alpha()
-                return pygame.transform.smoothscale(imz, sz)
-            except pygame.error:
-                continue
-    return None
+    fpp = os.path.join(ASSET_DIR, pth)
+    imz = pygame.image.load(fpp).convert_alpha()
+    return pygame.transform.smoothscale(imz, sz)
 
 #Image stuff
 PIECE_IMAGES = {}
-for _color in ('w', 'b'):
-    for _kind in ('P', 'N', 'B', 'R', 'Q', 'K'):
-        PIECE_IMAGES[(_color, _kind)] = loadimg(f'pieces/{_color}{_kind}.png', (SQ, SQ))
+for colorrr in ('w', 'b'):
+    for kindd in ('P', 'N', 'B', 'R', 'Q', 'K'):
+        PIECE_IMAGES[(colorrr, kindd)] = loadimg(f'pieces/{colorrr}{kindd}.png', (SQ, SQ))
 
-SNAKE_HEAD_IMG = loadimg('snake/head.png', (SQ, SQ))
-SNAKE_BODY_IMG = loadimg('snake/body.png', (SQ, SQ))
-SNAKE_FROZEN_IMG = loadimg('snake/head_frozen.png', (SQ, SQ))
 BOARD_LIGHT_IMG = loadimg('board/light.png', (SQ, SQ))
 BOARD_DARK_IMG = loadimg('board/dark.png', (SQ, SQ))
 BACKGROUND_IMG = loadimg('board/background.png', (WIDTH, HEIGHT))
-BAIT_IMG = loadimg('bait/bait.png', (SQ, SQ))
 
 SNAKE_TIERS = [
     {'dir': 'snake', 'speed': 1, 'turn_threshold': 0},
@@ -100,7 +78,7 @@ SNAKE_TIERS = [
     {'dir': 'snake_2', 'speed': 3, 'turn_threshold': 60},
 ]
 
-SNAKE_ASSET_KEYS = [
+SNAKEKEYS = [
     'head_up', 'head_down', 'head_left', 'head_right',
     'head_up_stunned', 'head_down_stunned', 'head_left_stunned', 'head_right_stunned',
     'body_horizontal', 'body_vertical',
@@ -110,36 +88,14 @@ SNAKE_ASSET_KEYS = [
 ]
 
 def loadtiers():
-    #Messy logic but i cba
-    base_fallback = {
-        'head_up': SNAKE_HEAD_IMG, 'head_down': SNAKE_HEAD_IMG,
-        'head_left': SNAKE_HEAD_IMG, 'head_right': SNAKE_HEAD_IMG,
-        'head_up_stunned': SNAKE_FROZEN_IMG, 'head_down_stunned': SNAKE_FROZEN_IMG,
-        'head_left_stunned': SNAKE_FROZEN_IMG, 'head_right_stunned': SNAKE_FROZEN_IMG,
-        'body_horizontal': SNAKE_BODY_IMG, 'body_vertical': SNAKE_BODY_IMG,
-        'body_topleft': SNAKE_BODY_IMG, 'body_topright': SNAKE_BODY_IMG,
-        'body_bottomleft': SNAKE_BODY_IMG, 'body_bottomright': SNAKE_BODY_IMG,
-        'tail_up': SNAKE_BODY_IMG, 'tail_down': SNAKE_BODY_IMG,
-        'tail_left': SNAKE_BODY_IMG, 'tail_right': SNAKE_BODY_IMG,
-        'apple': BAIT_IMG,
-    }
     tiers = []
-    prev = dict(base_fallback)
     for tinfo in SNAKE_TIERS:
-        cur = {}
-        for key in SNAKE_ASSET_KEYS:
-            img = loadimg(f"{tinfo['dir']}/{key}.png", (SQ, SQ))
-            if img is None and key.endswith('_stunned'):
-                img = loadimg(f"{tinfo['dir']}/{key[:-8]}.png", (SQ, SQ))
-            if img is None:
-                img = prev.get(key)
-            cur[key] = img
+        cur = {key: loadimg(f"{tinfo['dir']}/{key}.png", (SQ, SQ)) for key in SNAKEKEYS}
         tiers.append(cur)
-        prev = {k: (v if v is not None else prev.get(k)) for k, v in cur.items()}
     return tiers
 
 SNAKE_ASSETS = loadtiers()
-APPLE_BADGE_IMG = SNAKE_ASSETS[0].get('apple') or BAIT_IMG
+BADGE = SNAKE_ASSETS[0]['apple']
 
 def get_tier_idx(turn_count):
     idx = 0
@@ -233,7 +189,7 @@ def crawl_ray(grid, r0, c0, side, rayDirs, snakeCells, snakeHeadSq):
             pc += stepC
     return results
 
-def rawmoves(grid, r, c, snakeBody, snakeHead, baitSquare=None, ctx=None):
+def rawmoves(grid, r, c, snakeBody, snakeHead, baitSquare=None):
     piece = grid[r][c]
     if piece is None:
         return []
@@ -257,10 +213,6 @@ def rawmoves(grid, r, c, snakeBody, snakeHead, baitSquare=None, ctx=None):
             elif (fr, fc) not in snakeBody and grid[fr][fc] is not None and grid[fr][fc]['color'] != side:
                 moves.append((fr, fc))
             elif (fr, fc) not in snakeBody and baitSquare is not None and (fr, fc) == baitSquare:
-                moves.append((fr, fc))
-            elif ctx is not None and ctx.get('ep_target') == (fr, fc) and (fr, fc) not in snakeBody \
-                    and grid[fr][fc] is None and grid[r][fc] is not None \
-                    and grid[r][fc]['kind'] == 'P' and grid[r][fc]['color'] != side:
                 moves.append((fr, fc))
 
     elif kind == 'N':
@@ -290,34 +242,6 @@ def rawmoves(grid, r, c, snakeBody, snakeHead, baitSquare=None, ctx=None):
                 if not is_on_board(fr, fc) or (fr, fc) in snakeBody: continue
                 if (fr, fc) == snakeHead or grid[fr][fc] is None or grid[fr][fc]['color'] != side:
                     moves.append((fr, fc))
-
-        if ctx is not None:
-            homeRow = 7 if side == 'w' else 0
-            enemy = 'b' if side == 'w' else 'w'
-            if r == homeRow and c == 4 and not ctx['king_moved'][side]:
-                # -- kingside --
-                if not ctx['rook_moved'][side][7]:
-                    rookPc = grid[homeRow][7]
-                    if rookPc is not None and rookPc['kind'] == 'R' and rookPc['color'] == side and rookPc['alive']:
-                        gap = [(homeRow, 5), (homeRow, 6)]
-                        clearGap = all(grid[gr][gc] is None and (gr, gc) not in snakeBody and (gr, gc) != snakeHead
-                                       for gr, gc in gap)
-                        if clearGap:
-                            safePath = not any(is_threatened(grid, hr, hc, enemy, snakeBody)
-                                                for hr, hc in [(homeRow, 4), (homeRow, 5), (homeRow, 6)])
-                            if safePath: moves.append((homeRow, 6))
-
-                # -- queenside --
-                if not ctx['rook_moved'][side][0]:
-                    rookPc = grid[homeRow][0]
-                    if rookPc is not None and rookPc['kind'] == 'R' and rookPc['color'] == side and rookPc['alive']:
-                        gap = [(homeRow, 1), (homeRow, 2), (homeRow, 3)]
-                        clearGap = all(grid[gr][gc] is None and (gr, gc) not in snakeBody and (gr, gc) != snakeHead
-                                       for gr, gc in gap)
-                        if clearGap:
-                            safePath = not any(is_threatened(grid, hr, hc, enemy, snakeBody)
-                                                for hr, hc in [(homeRow, 4), (homeRow, 3), (homeRow, 2)])
-                            if safePath: moves.append((homeRow, 2))
     return moves
 
 def coveredBy(grid, r, c, snakeBody):
@@ -372,7 +296,7 @@ def in_check(grid, side, snakeBody):
     foe = 'b' if side == 'w' else 'w'
     return is_threatened(grid, kSq[0], kSq[1], foe, snakeBody)
 
-def bleh(grid, fromSq, toSq, side, snakeBody):
+def chk(grid, fromSq, toSq, side, snakeBody):
     ghost = [row[:] for row in grid]
     fr, fc = fromSq
     tr, tc = toSq
@@ -386,53 +310,31 @@ def filter_legal(grid, r, c, candidates, side, snakeHead, snakeBody):
     keep = []
     for mv in candidates:
         if snakeHead is not None and mv == snakeHead: continue
-        if bleh(grid, (r, c), mv, side, snakeBody):
+        if chk(grid, (r, c), mv, side, snakeBody):
             keep.append(mv)
     return keep
 
-def legal_moves(grid, r, c, snakeBody, snakeHead, baitSquare, side, ctx=None):
-    rough = rawmoves(grid, r, c, snakeBody, snakeHead, baitSquare, ctx=ctx)
+def legal_moves(grid, r, c, snakeBody, snakeHead, baitSquare, side):
+    rough = rawmoves(grid, r, c, snakeBody, snakeHead, baitSquare)
     alreadyInCheck = in_check(grid, side, snakeBody)
     ok = filter_legal(grid, r, c, rough, side, snakeHead, snakeBody)
     if (not alreadyInCheck) and snakeHead is not None and snakeHead in rough:
         ok.append(snakeHead)
     return ok
 
-def legalcheck(grid, side, snakeBody, snakeHead, ctx=None):
+def legalcheck(grid, side, snakeBody, snakeHead):
     for p in get_pieces(grid):
         if p['alive'] and p['color'] == side:
-            rough = rawmoves(grid, p['row'], p['col'], snakeBody, snakeHead, ctx=ctx)
+            rough = rawmoves(grid, p['row'], p['col'], snakeBody, snakeHead)
             if filter_legal(grid, p['row'], p['col'], rough, side, snakeHead, snakeBody):
                 return True
     return False
-
-def fresh_castle_ctx():
-    return {
-        'king_moved': {'w': False, 'b': False},
-        'rook_moved': {'w': {0: False, 7: False}, 'b': {0: False, 7: False}},
-        'ep_target': None,
-    }
-
-def recordmove(ctx, movedPiece, fromRC, toRC, capturedPiece):
-    side = movedPiece['color']
-    fr, fc = fromRC
-    if movedPiece['kind'] == 'K': ctx['king_moved'][side] = True
-    if movedPiece['kind'] == 'R' and fc in (0, 7) and fr in (0, 7): ctx['rook_moved'][side][fc] = True
-    if capturedPiece is not None and capturedPiece['kind'] == 'R':
-        cr, cc = toRC
-        if cc in (0, 7) and cr in (0, 7): ctx['rook_moved'][capturedPiece['color']][cc] = True
-
-    if movedPiece['kind'] == 'P' and abs(toRC[0] - fromRC[0]) == 2:
-        skippedRow = (fromRC[0] + toRC[0]) // 2
-        ctx['ep_target'] = (skippedRow, fromRC[1])
-    else:
-        ctx['ep_target'] = None
 
 class Snake:
     def __init__(self):
         self.body = [(3, 3), (3, 4), (3, 5)]
         self.target = None
-        self.target_color = 'w'
+        self.targetcolorrr = 'w'
         self.bait = None
         self.frozen_turns = 0
         self.alive = True
@@ -512,15 +414,15 @@ class Snake:
             return
         if rc is None: rc = self.reach(b)
 
-        pool = [p for p in op if p['color'] == self.target_color]
+        pool = [p for p in op if p['color'] == self.targetcolorrr]
         reachable = [p for p in pool if (p['row'], p['col']) in rc]
 
         if not reachable and allow_fallback:
-            other = 'b' if self.target_color == 'w' else 'w'
+            other = 'b' if self.targetcolorrr == 'w' else 'w'
             pool2 = [p for p in op if p['color'] == other]
             reachable2 = [p for p in pool2 if (p['row'], p['col']) in rc]
             if reachable2:
-                self.target_color = other
+                self.targetcolorrr = other
                 reachable = reachable2
 
         self.target = random.choice(reachable) if reachable else None
@@ -533,7 +435,7 @@ class Snake:
         self.frozen_turns = STUN_HALF_MOVES
         self.last_message = "The snake's head was struck! It's stunned for 3 turns."
         self.target = None
-        if random.random() < 0.5: self.target_color = 'b' if self.target_color == 'w' else 'w'
+        if random.random() < 0.5: self.targetcolorrr = 'b' if self.targetcolorrr == 'w' else 'w'
 
     def clrbait(self, rr, cc):
         if self.bait is not None and (self.bait['row'], self.bait['col']) == (rr, cc):
@@ -590,7 +492,7 @@ class Snake:
             nmz = {'P': 'a Pawn', 'N': 'a Knight', 'B': 'a Bishop', 'R': 'a Rook', 'Q': 'the Queen', 'K': 'a King'}[eatn['kind']]
             sidez = 'White' if eatn['color'] == 'w' else 'Black'
             self.last_message = f"The snake devoured {sidez}'s {nmz}!"
-            self.target_color = 'b' if eatn['color'] == 'w' else 'w'
+            self.targetcolorrr = 'b' if eatn['color'] == 'w' else 'w'
             self.strict_next = True
         else:
             self.last_message = "The snake gobbled up the bait!"
@@ -609,7 +511,6 @@ def new_game():
         'bait_mode': False,
         'toast_text': "",
         'toast_timer': 0,
-        'castlectx': fresh_castle_ctx(),
         'promo_pending': None,
     }
 
@@ -647,7 +548,7 @@ def s_endturn(S, b, SNK, king_eaten=None):
         bodyonly, hed = SNK.blk()
         clr = S['turn']
         chk = in_check(b, clr, bodyonly)
-        if not legalcheck(b, clr, bodyonly, hed, ctx=S['castlectx']):
+        if not legalcheck(b, clr, bodyonly, hed):
             S['game_over'] = True
             if chk:
                 winz = 'Black' if clr == 'w' else 'White'
@@ -687,7 +588,7 @@ def s_turn(S, b, SNK):
         if was_frozen or not moved: break
 
     s_endturn(S, b, SNK, king_eaten=king_eaten)
-
+ 
 def do_attack(S, b, SNK):
     SNK.hit()
     S['selected'] = None
@@ -698,41 +599,16 @@ def draw_square(rr, cc):
     x, y = cc * SQ, rr * SQ
     lite = (rr + cc) % 2 == 0
     imz = BOARD_LIGHT_IMG if lite else BOARD_DARK_IMG
-    if imz is not None: screen.blit(imz, (x, y))
-    else: pygame.draw.rect(screen, LT if lite else DK, (x, y, SQ, SQ))
+    screen.blit(imz, (x, y))
 
 def draw_piece(pcx, pos=None):
     if pos is None: x, y = pcx['col'] * SQ, pcx['row'] * SQ
     else: x, y = pos
-    imz = PIECE_IMAGES.get((pcx['color'], pcx['kind']))
-    if imz is not None:
-        screen.blit(imz, (x, y))
-        return
-    #Fallback
-    glf = WHITE_GLYPH[pcx['kind']] if pcx['color'] == 'w' else BLACK_GLYPH[pcx['kind']]
-    outc = (0, 0, 0) if pcx['color'] == 'w' else (255, 255, 255)
-    filc = (255, 255, 255) if pcx['color'] == 'w' else (20, 20, 20)
-    basz = pf.render(glf, True, filc)
-    outz = pf.render(glf, True, outc)
-    cx = x + SQ // 2 - basz.get_width() // 2
-    cy = y + SQ // 2 - basz.get_height() // 2
-    for ox, oy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        screen.blit(outz, (cx + ox, cy + oy))
-    screen.blit(basz, (cx, cy))
+    imz = PIECE_IMAGES[(pcx['color'], pcx['kind'])]
+    screen.blit(imz, (x, y))
 
 def draw_segment(img, x, y, key):
-    if img is not None:
-        screen.blit(img, (x, y))
-        return
-    cx, cy = x + SQ // 2, y + SQ // 2
-    if key.startswith('head'):
-        stunned = 'stunned' in key
-        pygame.draw.circle(screen, SFC if stunned else SHC, (cx, cy), SQ // 2 - 6)
-        pygame.draw.circle(screen, SEC, (cx - 8, cy - 6), 4)
-        pygame.draw.circle(screen, SEC, (cx + 8, cy - 6), 4)
-        if stunned: pygame.draw.circle(screen, SFC, (cx, cy), SQ // 2 - 2, 3)
-    else:
-        pygame.draw.circle(screen, SBC, (cx, cy), SQ // 2 - 6)
+    screen.blit(img, (x, y))
 
 def draw_snake(SNK, S):
     if not SNK.alive: return
@@ -742,7 +618,7 @@ def draw_snake(SNK, S):
     for i, (rr, cc) in enumerate(body):
         x, y = cc * SQ, rr * SQ
         key = get_seg_key(body, i, stunned_head=(stunned and i == 0))
-        draw_segment(assets.get(key), x, y, key)
+        draw_segment(assets[key], x, y, key)
 
 def draw_target(SNK):
     if not SNK.alive or SNK.target is None: return
@@ -758,16 +634,8 @@ def draw_bait(SNK, S):
     x, y = cc * SQ, rr * SQ
     cx, cy = x + SQ // 2, y + SQ // 2
     tier_idx = get_tier_idx(S['full_turn_count'])
-    imz = SNAKE_ASSETS[tier_idx].get('apple') or BAIT_IMG
-    if imz is not None:
-        screen.blit(imz, (x, y))
-    else:
-        #Fallback
-        pygame.draw.circle(screen, BTC, (cx, cy), SQ // 2 - 20)
-        pygame.draw.circle(screen, (255, 255, 255), (cx, cy), SQ // 2 - 20, 2)
-        lbz = smf.render("B", True, (255, 255, 255))
-        lrz = lbz.get_rect(center=(cx, cy))
-        screen.blit(lbz, lrz)
+    imz = SNAKE_ASSETS[tier_idx]['apple']
+    screen.blit(imz, (x, y))
     pygame.draw.circle(screen, BTR, (cx, cy), SQ // 2 - 6, 2)
 
 def draw_badge(rect, bgc, ringon):
@@ -775,14 +643,8 @@ def draw_badge(rect, bgc, ringon):
     bdc = (0, 0, 0) if bgc == BADGE_WHITE_BG else (255, 255, 255)
     pygame.draw.rect(screen, bdc, rect, 2, border_radius=8)
     cx, cy = rect.center
-    if APPLE_BADGE_IMG is not None:
-        scz = pygame.transform.smoothscale(APPLE_BADGE_IMG, (rect.width - 10, rect.height - 10))
-        screen.blit(scz, scz.get_rect(center=(cx, cy)))
-    else:
-        pygame.draw.circle(screen, BTC, (cx, cy), rect.width // 2 - 8)
-        txc = (255, 255, 255) if bgc == BADGE_BLACK_BG else (30, 30, 30)
-        lbz = smf.render("B", True, txc)
-        screen.blit(lbz, lbz.get_rect(center=(cx, cy)))
+    scz = pygame.transform.smoothscale(BADGE, (rect.width - 10, rect.height - 10))
+    screen.blit(scz, scz.get_rect(center=(cx, cy)))
     if ringon:
         pygame.draw.rect(screen, BADGE_RING, rect.inflate(6, 6), 3, border_radius=10)
 
@@ -858,7 +720,7 @@ def draw_promo(S):
         draw_piece(fakepc, pos=(rct.x + (rct.w - SQ) // 2, rct.y + (rct.h - SQ) // 2))
 
 def draw_all(bbb, S, SNK):
-    if BACKGROUND_IMG is not None: screen.blit(BACKGROUND_IMG, (0, 0))
+    screen.blit(BACKGROUND_IMG, (0, 0))
     for rr in range(8):
         for cc in range(8): draw_square(rr, cc)
 
@@ -905,37 +767,12 @@ def apply_moves(S, BRD, SNK, srcRC, dstRC):
     sr, sc = srcRC
     rr, cc = dstRC
     movingPc = BRD[sr][sc]
-    ctx = S['castlectx']
-    ep_before = ctx['ep_target']
     capturedPc = BRD[rr][cc]
 
-    isEnPassant = (movingPc['kind'] == 'P' and (rr, cc) == ep_before and capturedPc is None and sc != cc)
-    epVictimSq = None
-    if isEnPassant:
-        epVictimSq = (sr, cc)
-        capturedPc = BRD[epVictimSq[0]][epVictimSq[1]]
-
-    isCastle = (movingPc['kind'] == 'K' and abs(cc - sc) == 2)
     BRD[sr][sc] = None
     BRD[rr][cc] = movingPc
     movingPc['row'], movingPc['col'] = rr, cc
 
-    if isEnPassant and epVictimSq is not None: BRD[epVictimSq[0]][epVictimSq[1]] = None
-
-    if isCastle:
-        homeRow = sr
-        if cc == 6:
-            rookPc = BRD[homeRow][7]
-            BRD[homeRow][7] = None
-            BRD[homeRow][5] = rookPc
-            if rookPc is not None: rookPc['row'], rookPc['col'] = homeRow, 5
-        elif cc == 2:
-            rookPc = BRD[homeRow][0]
-            BRD[homeRow][0] = None
-            BRD[homeRow][3] = rookPc
-            if rookPc is not None: rookPc['row'], rookPc['col'] = homeRow, 3
-
-    recordmove(ctx, movingPc, (sr, sc), (rr, cc), capturedPc)
     kingcap = capturedPc is not None and capturedPc['kind'] == 'K'
     if capturedPc is not None: capturedPc['alive'] = False
 
@@ -1032,7 +869,7 @@ def main():
                     pcx = BRD[rr][cc]
                     if pcx is not None and pcx['color'] == S['turn']:
                         S['selected'] = (rr, cc)
-                        S['legal_moves'] = legal_moves(BRD, rr, cc, bodyonly, hedz, baitrc, S['turn'], ctx=S['castlectx'])
+                        S['legal_moves'] = legal_moves(BRD, rr, cc, bodyonly, hedz, baitrc, S['turn'])
                 else:
                     if (rr, cc) in S['legal_moves']:
                         sr, sc = S['selected']
@@ -1045,7 +882,7 @@ def main():
                         pcx = BRD[rr][cc]
                         if pcx is not None and pcx['color'] == S['turn']:
                             S['selected'] = (rr, cc)
-                            S['legal_moves'] = legal_moves(BRD, rr, cc, bodyonly, hedz, baitrc, S['turn'], ctx=S['castlectx'])
+                            S['legal_moves'] = legal_moves(BRD, rr, cc, bodyonly, hedz, baitrc, S['turn'])
                         else:
                             S['selected'] = None
                             S['legal_moves'] = []
