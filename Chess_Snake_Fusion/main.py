@@ -16,7 +16,7 @@ WIDTH = BOARD_PX
 HEIGHT = BOARD_PX + STATUS_H
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Chess with a Hungry Snake")
+pygame.display.set_caption("Chess x Snake Fusion")
 clock = pygame.time.Clock()
 
 # Colors (I just copy-pasted these from a color picker, don't judge)
